@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Relationship Flowchart - COMP5348 Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 6px 12px;
+            border-radius: 15px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-store { background: #e3f2fd; color: #1565c0; }
+        .btn-bank { background: #f3e5f5; color: #7b1fa2; }
+        .btn-delivery { background: #e8f5e8; color: #2e7d32; }
+        .btn-email { background: #fff3e0; color: #ef6c00; }
+        .btn-all { background: #333; color: white; }
+        .btn-reset { background: #ffebee; color: #c62828; }
+
+        .diagram-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: auto;
+            padding-top: 120px;
+        }
+
+        .flowchart-svg {
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 30px 30px;
+            background-position: 0 0, 0 15px, 15px -15px, -15px 0px;
+        }
+
+        .table-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .table-node:hover {
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .table-rect {
+            stroke-width: 2;
+            rx: 8;
+            ry: 8;
+            transition: all 0.3s ease;
+        }
+
+        .table-title {
+            font-weight: bold;
+            font-size: 14px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .table-field {
+            font-size: 11px;
+            fill: #555;
+            text-anchor: start;
+        }
+
+        .relationship-line {
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+            transition: all 0.3s ease;
+        }
+
+        .relationship-label {
+            font-size: 10px;
+            font-weight: bold;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            fill: #333;
+            background: white;
+            padding: 2px 4px;
+        }
+
+        /* Application-specific colors */
+        .store-table { fill: #e3f2fd; stroke: #1565c0; }
+        .store-title { fill: #1565c0; }
+        .store-line { stroke: #1565c0; }
+
+        .bank-table { fill: #f3e5f5; stroke: #7b1fa2; }
+        .bank-title { fill: #7b1fa2; }
+        .bank-line { stroke: #7b1fa2; }
+
+        .delivery-table { fill: #e8f5e8; stroke: #2e7d32; }
+        .delivery-title { fill: #2e7d32; }
+        .delivery-line { stroke: #2e7d32; }
+
+        .email-table { fill: #fff3e0; stroke: #ef6c00; }
+        .email-title { fill: #ef6c00; }
+        .email-line { stroke: #ef6c00; }
+
+        .cross-app-line { 
+            stroke: #ff9800; 
+            stroke-dasharray: 5,5;
+            stroke-width: 3;
+        }
+
+        .hidden { display: none !important; }
+
+        .legend {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.85em;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+        }
+
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            pointer-events: none;
+            z-index: 1001;
+            max-width: 300px;
+            white-space: pre-line;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                gap: 5px;
+            }
+            
+            .control-btn {
+                padding: 4px 8px;
+                font-size: 0.75em;
+            }
+            
+            h1 {
+                font-size: 1.4em;
+            }
+            
+            .legend {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Database Relationship Flowchart</h1>
+            <div class="controls">
+                <button class="control-btn btn-all" onclick="showAll()">Show All</button>
+                <button class="control-btn btn-store" onclick="showApplication('store')">🏪 Store App</button>
+                <button class="control-btn btn-bank" onclick="showApplication('bank')">🏦 Bank App</button>
+                <button class="control-btn btn-delivery" onclick="showApplication('delivery')">🚚 Delivery App</button>
+                <button class="control-btn btn-email" onclick="showApplication('email')">📧 Email App</button>
+                <button class="control-btn btn-reset" onclick="resetView()">🔄 Reset View</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-title">Relationship Types</div>
+            <div class="legend-item">
+                <svg width="20" height="12">
+                    <line x1="0" y1="6" x2="20" y2="6" stroke="#1565c0" stroke-width="2" marker-end="url(#arrowhead)"/>
+                </svg>
+                <span>Internal (1:N, 1:1)</span>
+            </div>
+            <div class="legend-item">
+                <svg width="20" height="12">
+                    <line x1="0" y1="6" x2="20" y2="6" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+                </svg>
+                <span>Cross-App Reference</span>
+            </div>
+        </div>
+
+        <div class="diagram-container">
+            <svg class="flowchart-svg" id="flowchartSvg" viewBox="0 0 1400 1000">
+                <!-- Arrow marker definitions -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                            refX="10" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                    </marker>
+                </defs>
+
+                <!-- Store Application Tables -->
+                <g class="app-group store-group" data-app="store">
+                    <!-- Users Table -->
+                    <g class="table-node" data-table="users" onclick="showTableInfo('users')">
+                        <rect class="table-rect store-table" x="50" y="50" width="140" height="120"/>
+                        <text class="table-title store-title" x="120" y="70">users</text>
+                        <text class="table-field" x="60" y="90">🔑 id</text>
+                        <text class="table-field" x="60" y="105">firstName</text>
+                        <text class="table-field" x="60" y="120">lastName</text>
+                        <text class="table-field" x="60" y="135">email</text>
+                        <text class="table-field" x="60" y="150">passwordHash</text>
+                    </g>
+
+                    <!-- Orders Table -->
+                    <g class="table-node" data-table="orders" onclick="showTableInfo('orders')">
+                        <rect class="table-rect store-table" x="250" y="200" width="140" height="160"/>
+                        <text class="table-title store-title" x="320" y="220">orders</text>
+                        <text class="table-field" x="260" y="240">🔑 id</text>
+                        <text class="table-field" x="260" y="255">timestamp</text>
+                        <text class="table-field" x="260" y="270">quantity</text>
+                        <text class="table-field" x="260" y="285">amount</text>
+                        <text class="table-field" x="260" y="300">orderStatus</text>
+                        <text class="table-field" x="260" y="315">🔗 user_id</text>
+                        <text class="table-field" x="260" y="330">🔗 product_id</text>
+                    </g>
+
+                    <!-- Product Table -->
+                    <g class="table-node" data-table="product" onclick="showTableInfo('product')">
+                        <rect class="table-rect store-table" x="450" y="50" width="140" height="100"/>
+                        <text class="table-title store-title" x="520" y="70">product</text>
+                        <text class="table-field" x="460" y="90">🔑 id</text>
+                        <text class="table-field" x="460" y="105">name</text>
+                        <text class="table-field" x="460" y="120">description</text>
+                        <text class="table-field" x="460" y="135">price</text>
+                    </g>
+
+                    <!-- Payment Table -->
+                    <g class="table-node" data-table="payment" onclick="showTableInfo('payment')">
+                        <rect class="table-rect store-table" x="50" y="400" width="140" height="140"/>
+                        <text class="table-title store-title" x="120" y="420">payment</text>
+                        <text class="table-field" x="60" y="440">🔑 id</text>
+                        <text class="table-field" x="60" y="455">amount</text>
+                        <text class="table-field" x="60" y="470">paymentStatus</text>
+                        <text class="table-field" x="60" y="485">🔗 order_id</text>
+                        <text class="table-field" x="60" y="500">transactionRecordId</text>
+                        <text class="table-field" x="60" y="515">fromAccountId</text>
+                    </g>
+
+                    <!-- Refund Table -->
+                    <g class="table-node" data-table="refund" onclick="showTableInfo('refund')">
+                        <rect class="table-rect store-table" x="250" y="400" width="140" height="100"/>
+                        <text class="table-title store-title" x="320" y="420">refund</text>
+                        <text class="table-field" x="260" y="440">🔑 id</text>
+                        <text class="table-field" x="260" y="455">amount</text>
+                        <text class="table-field" x="260" y="470">🔗 order_id</text>
+                        <text class="table-field" x="260" y="485">transactionRecordId</text>
+                    </g>
+
+                    <!-- Warehouse Table -->
+                    <g class="table-node" data-table="warehouse" onclick="showTableInfo('warehouse')">
+                        <rect class="table-rect store-table" x="650" y="50" width="140" height="100"/>
+                        <text class="table-title store-title" x="720" y="70">warehouse</text>
+                        <text class="table-field" x="660" y="90">🔑 id</text>
+                        <text class="table-field" x="660" y="105">name</text>
+                        <text class="table-field" x="660" y="120">address</text>
+                    </g>
+
+                    <!-- Inventory Table -->
+                    <g class="table-node" data-table="inventory" onclick="showTableInfo('inventory')">
+                        <rect class="table-rect store-table" x="650" y="200" width="140" height="120"/>
+                        <text class="table-title store-title" x="720" y="220">inventory</text>
+                        <text class="table-field" x="660" y="240">🔑 id</text>
+                        <text class="table-field" x="660" y="255">quantity</text>
+                        <text class="table-field" x="660" y="270">🔗 product_id</text>
+                        <text class="table-field" x="660" y="285">🔗 warehouse_id</text>
+                    </g>
+
+                    <!-- Inventory Transaction Table -->
+                    <g class="table-node" data-table="inventorytransaction" onclick="showTableInfo('inventorytransaction')">
+                        <rect class="table-rect store-table" x="450" y="400" width="140" height="120"/>
+                        <text class="table-title store-title" x="520" y="420">inventorytransaction</text>
+                        <text class="table-field" x="460" y="440">🔑 id</text>
+                        <text class="table-field" x="460" y="455">quantity</text>
+                        <text class="table-field" x="460" y="470">status</text>
+                        <text class="table-field" x="460" y="485">🔗 inventory_id</text>
+                        <text class="table-field" x="460" y="500">🔗 order_id</text>
+                    </g>
+                </g>
+
+                <!-- Bank Application Tables -->
+                <g class="app-group bank-group" data-app="bank">
+                    <!-- Customer Table -->
+                    <g class="table-node" data-table="customer" onclick="showTableInfo('customer')">
+                        <rect class="table-rect bank-table" x="900" y="50" width="140" height="100"/>
+                        <text class="table-title bank-title" x="970" y="70">customer</text>
+                        <text class="table-field" x="910" y="90">🔑 id</text>
+                        <text class="table-field" x="910" y="105">firstName</text>
+                        <text class="table-field" x="910" y="120">lastName</text>
+                    </g>
+
+                    <!-- Account Table -->
+                    <g class="table-node" data-table="account" onclick="showTableInfo('account')">
+                        <rect class="table-rect bank-table" x="900" y="200" width="140" height="120"/>
+                        <text class="table-title bank-title" x="970" y="220">account</text>
+                        <text class="table-field" x="910" y="240">🔑 id</text>
+                        <text class="table-field" x="910" y="255">name</text>
+                        <text class="table-field" x="910" y="270">balance</text>
+                        <text class="table-field" x="910" y="285">🔗 customer_id</text>
+                    </g>
+
+                    <!-- Transaction Record Table -->
+                    <g class="table-node" data-table="transactionrecord" onclick="showTableInfo('transactionrecord')">
+                        <rect class="table-rect bank-table" x="900" y="400" width="140" height="140"/>
+                        <text class="table-title bank-title" x="970" y="420">transactionrecord</text>
+                        <text class="table-field" x="910" y="440">🔑 id</text>
+                        <text class="table-field" x="910" y="455">amount</text>
+                        <text class="table-field" x="910" y="470">memo</text>
+                        <text class="table-field" x="910" y="485">time</text>
+                        <text class="table-field" x="910" y="500">🔗 fromAccount_id</text>
+                        <text class="table-field" x="910" y="515">🔗 toAccount_id</text>
+                    </g>
+                </g>
+
+                <!-- Delivery Application Tables -->
+                <g class="app-group delivery-group" data-app="delivery">
+                    <!-- Delivery Table -->
+                    <g class="table-node" data-table="delivery" onclick="showTableInfo('delivery')">
+                        <rect class="table-rect delivery-table" x="50" y="650" width="140" height="160"/>
+                        <text class="table-title delivery-title" x="120" y="670">delivery</text>
+                        <text class="table-field" x="60" y="690">🔑 id</text>
+                        <text class="table-field" x="60" y="705">orderId</text>
+                        <text class="table-field" x="60" y="720">status</text>
+                        <text class="table-field" x="60" y="735">timestamp</text>
+                        <text class="table-field" x="60" y="750">quantity</text>
+                        <text class="table-field" x="60" y="765">address</text>
+                        <text class="table-field" x="60" y="780">email</text>
+                    </g>
+                </g>
+
+                <!-- Email Application Tables -->
+                <g class="app-group email-group" data-app="email">
+                    <!-- Email Table -->
+                    <g class="table-node" data-table="email" onclick="showTableInfo('email')">
+                        <rect class="table-rect email-table" x="250" y="650" width="140" height="160"/>
+                        <text class="table-title email-title" x="320" y="670">email</text>
+                        <text class="table-field" x="260" y="690">🔑 id</text>
+                        <text class="table-field" x="260" y="705">deliveryId</text>
+                        <text class="table-field" x="260" y="720">emailAddress</text>
+                        <text class="table-field" x="260" y="735">description</text>
+                        <text class="table-field" x="260" y="750">timestamp</text>
+                        <text class="table-field" x="260" y="765">status</text>
+                        <text class="table-field" x="260" y="780">address</text>
+                    </g>
+                </g>
+
+                <!-- Internal Relationships -->
+                <g class="relationships internal-relations">
+                    <!-- users -> orders -->
+                    <line class="relationship-line store-line" x1="190" y1="110" x2="250" y2="280" />
+                    <text class="relationship-label" x="220" y="195">1:N</text>
+
+                    <!-- product -> orders -->
+                    <line class="relationship-line store-line" x1="450" y1="120" x2="390" y2="280" />
+                    <text class="relationship-label" x="420" y="200">1:N</text>
+
+                    <!-- orders -> payment -->
+                    <line class="relationship-line store-line" x1="250" y1="350" x2="190" y2="400" />
+                    <text class="relationship-label" x="220" y="375">1:1</text>
+
+                    <!-- orders -> refund -->
+                    <line class="relationship-line store-line" x1="320" y1="360" x2="320" y2="400" />
+                    <text class="relationship-label" x="340" y="380">1:1</text>
+
+                    <!-- orders -> inventorytransaction -->
+                    <line class="relationship-line store-line" x1="390" y1="320" x2="520" y2="400" />
+                    <text class="relationship-label" x="455" y="360">1:N</text>
+
+                    <!-- product -> inventory -->
+                    <line class="relationship-line store-line" x1="590" y1="100" x2="650" y2="260" />
+                    <text class="relationship-label" x="620" y="180">1:N</text>
+
+                    <!-- warehouse -> inventory -->
+                    <line class="relationship-line store-line" x1="720" y1="150" x2="720" y2="200" />
+                    <text class="relationship-label" x="740" y="175">1:N</text>
+
+                    <!-- inventory -> inventorytransaction -->
+                    <line class="relationship-line store-line" x1="650" y1="300" x2="590" y2="460" />
+                    <text class="relationship-label" x="620" y="380">1:N</text>
+
+                    <!-- customer -> account -->
+                    <line class="relationship-line bank-line" x1="970" y1="150" x2="970" y2="200" />
+                    <text class="relationship-label" x="990" y="175">1:N</text>
+
+                    <!-- account -> transactionrecord (from) -->
+                    <line class="relationship-line bank-line" x1="970" y1="320" x2="970" y2="400" />
+                    <text class="relationship-label" x="990" y="360">1:N</text>
+                </g>
+
+                <!-- Cross-Application Relationships -->
+                <g class="relationships cross-app-relations">
+                    <!-- payment -> transactionrecord -->
+                    <path class="relationship-line cross-app-line" d="M 190 500 Q 600 600 900 470" />
+                    <text class="relationship-label" x="545" y="540">REF</text>
+
+                    <!-- payment -> account -->
+                    <path class="relationship-line cross-app-line" d="M 190 515 Q 650 650 900 260" />
+                    <text class="relationship-label" x="545" y="420">REF</text>
+
+                    <!-- refund -> transactionrecord -->
+                    <path class="relationship-line cross-app-line" d="M 390 485 Q 700 550 900 485" />
+                    <text class="relationship-label" x="645" y="485">REF</text>
+
+                    <!-- delivery -> orders -->
+                    <path class="relationship-line cross-app-line" d="M 120 650 Q 120 500 280 360" />
+                    <text class="relationship-label" x="150" y="505">REF</text>
+
+                    <!-- email -> delivery -->
+                    <line class="relationship-line cross-app-line" x1="250" y1="730" x2="190" y2="730" />
+                    <text class="relationship-label" x="220" y="720">REF</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip" style="display: none;"></div>
+
+    <script>
+        // Table information data
+        const tableInfo = {
+            users: "User account management\n• Primary key: id\n• Stores customer information\n• Links to orders (1:N)",
+            orders: "Order management center\n• Links to users, products\n• Connected to payments & refunds\n• Tracks order lifecycle",
+            product: "Product catalog\n• Contains pricing information\n• Links to orders and inventory\n• Core business entity",
+            payment: "Payment processing\n• Links to bank transactions\n• References external accounts\n• Tracks payment status",
+            refund: "Refund management\n• Links to orders\n• References bank transactions\n• Handles return processing",
+            warehouse: "Warehouse locations\n• Physical storage information\n• Links to inventory records\n• Supports distribution",
+            inventory: "Stock management\n• Product quantities per warehouse\n• Links to transactions\n• Prevents overselling",
+            inventorytransaction: "Inventory movements\n• Tracks stock changes\n• Links to orders\n• Audit trail for inventory",
+            customer: "Bank customer data\n• Separate from store users\n• Links to bank accounts\n• Banking system entity",
+            account: "Bank account management\n• Account balances\n• Transaction history\n• Customer ownership",
+            transactionrecord: "Financial transactions\n• Money transfers\n• Referenced by payments\n• Immutable transaction log",
+            delivery: "Delivery tracking\n• References store orders\n• Shipping information\n• Status tracking",
+            email: "Email notifications\n• Links to deliveries\n• Notification system\n• Communication tracking"
+        };
+
+        // Application filtering
+        function showApplication(app) {
+            hideAll();
+            document.querySelectorAll(`[data-app="${app}"]`).forEach(el => {
+                el.classList.remove('hidden');
+            });
+            
+            // Show relevant relationships
+            if (app === 'store') {
+                document.querySelector('.internal-relations').classList.remove('hidden');
+            } else if (app === 'bank') {
+                document.querySelector('.internal-relations').classList.remove('hidden');
+            }
+        }
+
+        function showAll() {
+            document.querySelectorAll('.app-group, .relationships').forEach(el => {
+                el.classList.remove('hidden');
+            });
+        }
+
+        function hideAll() {
+            document.querySelectorAll('.app-group, .relationships').forEach(el => {
+                el.classList.add('hidden');
+            });
+        }
+
+        function resetView() {
+            showAll();
+            document.querySelector('.diagram-container').scrollTo(0, 0);
+        }
+
+        // Table information display
+        function showTableInfo(tableName) {
+            const tooltip = document.getElementById('tooltip');
+            const info = tableInfo[tableName];
+            
+            if (info) {
+                tooltip.innerHTML = `<strong>${tableName}</strong>\n${info}`;
+                tooltip.style.display = 'block';
+            }
+        }
+
+        // Mouse tracking for tooltip
+        document.addEventListener('mousemove', function(e) {
+            const tooltip = document.getElementById('tooltip');
+            if (tooltip.style.display === 'block') {
+                tooltip.style.left = (e.pageX + 10) + 'px';
+                tooltip.style.top = (e.pageY + 10) + 'px';
+            }
+        });
+
+        // Hide tooltip when not hovering over tables
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.table-node')) {
+                document.getElementById('tooltip').style.display = 'none';
+            }
+        });
+
+        // Interactive animations
+        document.querySelectorAll('.table-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.filter = 'drop-shadow(0 6px 12px rgba(0,0,0,0.3))';
+            });
+            
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.filter = 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))';
+            });
+        });
+
+        // Initialize view
+        showAll();
+
+        console.log('🎉 Database Flowchart Loaded!');
+        console.log('📊 Interactive table relationships');
+        console.log('🖱️ Click tables for details');
+        console.log('🔗 Visual relationship mapping');
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+store_application.zip
+.idea
+store_application/src/main/resources/application.properties
+bank_application/src/main/resources/application.properties
+delivery_application/src/main/resources/application.properties
