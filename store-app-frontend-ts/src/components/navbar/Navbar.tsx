@@ -37,7 +37,8 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
 
   return (
     <nav className={`bg-blue-600 ${className || ''}`}>
-      <div className="max-w-6xl mx-auto px-4 py-3flex justify-between items-center">
+      {/* Use flex layout so brand stays on the left and auth links on the right */}
+      <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div className="text-white text-2xl font-bold">
           <Link to="/">Brand</Link>
         </div>
