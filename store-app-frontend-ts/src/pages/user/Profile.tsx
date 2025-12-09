@@ -3,16 +3,17 @@
  * 显示和编辑用户个人信息
  */
 
-import React, { useState, useEffect } from 'react';
+import type { AxiosError } from 'axios';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { userService, getSession } from '../../services';
-import {
+import { getSession, userService } from '../../services';
+import type {
+  FormSubmitHandler,
+  InputChangeHandler,
   UserProfileFormData,
   UserProfilePageProps,
-  InputChangeHandler,
-  FormSubmitHandler,
 } from '../../types';
-import { AxiosError } from 'axios';
 
 /**
  * API 错误响应类型
@@ -69,7 +70,8 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
       return;
     }
 
-    userService.update(userId, formData)
+    userService
+      .update(userId, formData)
       .then((response) => {
         // 检查响应状态是否为 200（成功）
         if (response.status === 200) {
@@ -83,8 +85,7 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
         if (err.response) {
           console.error('Error response:', err.response.data);
           setError(
-            err.response.data?.message ||
-              'Failed to update profile. Please try again later.'
+            err.response.data?.message || 'Failed to update profile. Please try again later.',
           );
         } else if (err.request) {
           console.error('No response from server:', err.request);
@@ -118,10 +119,7 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
         });
       } catch (err) {
         const axiosError = err as AxiosError<ApiError>;
-        setError(
-          axiosError.message ||
-            'Failed to fetch user data. Please try again later.'
-        );
+        setError(axiosError.message || 'Failed to fetch user data. Please try again later.');
         console.error('Error fetching user data:', err);
       }
     };
@@ -142,6 +140,7 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
               <span className="block sm:inline">{error}</span>
               <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
                 <button
+                  type="button"
                   onClick={() => setError('')}
                   className="text-red-700 hover:text-red-900"
                   aria-label="Close error message"
@@ -153,7 +152,9 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
           </div>
         </div>
       )}
-      <div className={`max-w-lg mx-auto my-10 p-6 bg-white rounded-lg shadow-lg ${className || ''}`}>
+      <div
+        className={`max-w-lg mx-auto my-10 p-6 bg-white rounded-lg shadow-lg ${className || ''}`}
+      >
         <h2 className="text-2xl font-bold text-center mb-4">User Profile</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

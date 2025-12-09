@@ -4,13 +4,13 @@
  */
 
 import http from '../http-common';
-import {
-  Order,
-  OrderResponse,
-  OrderListResponse,
+import type {
   CreateOrderRequest,
-  UpdateOrderRequest,
   IOrderService,
+  Order,
+  OrderListResponse,
+  OrderResponse,
+  UpdateOrderRequest,
 } from '../types';
 
 /**
@@ -26,9 +26,7 @@ export const getOrderList = async (): Promise<OrderListResponse> => {
  * @param userId - 用户ID
  * @returns Promise 包含用户订单数组的响应
  */
-export const getOrderListByUser = async (
-  userId: number
-): Promise<OrderListResponse> => {
+export const getOrderListByUser = async (userId: number): Promise<OrderListResponse> => {
   return http.get<Order[]>(`/store/users/${userId}/orders`);
 };
 
@@ -38,10 +36,7 @@ export const getOrderListByUser = async (
  * @param orderId - 订单ID
  * @returns Promise 包含订单信息的响应
  */
-export const getOrder = async (
-  userId: number,
-  orderId: number
-): Promise<OrderResponse> => {
+export const getOrder = async (userId: number, orderId: number): Promise<OrderResponse> => {
   return http.get<Order>(`/store/users/${userId}/orders/${orderId}`);
 };
 
@@ -53,7 +48,7 @@ export const getOrder = async (
  */
 export const createOrder = async (
   userId: number,
-  data: CreateOrderRequest
+  data: CreateOrderRequest,
 ): Promise<OrderResponse> => {
   return http.post<Order>(`/store/users/${userId}/orders`, data);
 };
@@ -66,7 +61,7 @@ export const createOrder = async (
  */
 export const updateOrder = async (
   orderId: number,
-  data: UpdateOrderRequest
+  data: UpdateOrderRequest,
 ): Promise<OrderResponse> => {
   return http.put<Order>(`/store/orders/${orderId}`, data);
 };
@@ -77,10 +72,7 @@ export const updateOrder = async (
  * @param orderId - 订单ID
  * @returns Promise 包含取消后订单信息的响应
  */
-export const cancelOrder = async (
-  userId: number,
-  orderId: number
-): Promise<OrderResponse> => {
+export const cancelOrder = async (userId: number, orderId: number): Promise<OrderResponse> => {
   return http.put<Order>(`/store/users/${userId}/orders/${orderId}/cancel`);
 };
 

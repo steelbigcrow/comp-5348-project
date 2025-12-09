@@ -3,17 +3,18 @@
  * 处理用户注册功能
  */
 
-import React, { useState } from 'react';
+import type { AxiosError } from 'axios';
+import type React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ErrorMessage } from '../../../components';
-import { userService, setSession } from '../../../services';
-import {
+import { setSession, userService } from '../../../services';
+import type {
+  FormSubmitHandler,
+  InputChangeHandler,
   RegisterFormData,
   RegisterPageProps,
-  InputChangeHandler,
-  FormSubmitHandler,
 } from '../../../types';
-import { AxiosError } from 'axios';
 
 /**
  * API 错误响应类型
@@ -41,7 +42,7 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
   const [error, setError] = useState<string>('');
 
   // 路由导航
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   /**
    * 处理输入框变更
@@ -60,8 +61,9 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
    */
   const handleSubmit: FormSubmitHandler = (e) => {
     e.preventDefault();
-    
-    userService.create(formData)
+
+    userService
+      .create(formData)
       .then((response) => {
         // 检查响应状态是否为 200（成功）
         if (response.status === 200) {
@@ -86,7 +88,7 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
           setError('Something went wrong. Please try again.');
         }
       });
-    
+
     console.log('Registering user:', formData);
   };
 
@@ -94,11 +96,11 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
     <>
       {error && <ErrorMessage message={error} onClose={() => setError('')} />}
 
-      <div className={`min-h-screen flex justify-center items-center bg-gray-100 ${className || ''}`}>
+      <div
+        className={`min-h-screen flex justify-center items-center bg-gray-100 ${className || ''}`}
+      >
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-          <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
-            Register
-          </h2>
+          <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Register</h2>
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -163,7 +165,8 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
             >
               Register
             </button>
-          </form></div>
+          </form>
+        </div>
       </div>
     </>
   );

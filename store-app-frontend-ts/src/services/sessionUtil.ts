@@ -3,7 +3,7 @@
  * 管理用户会话数据的存储和获取
  */
 
-import { SessionData, SessionKey } from '../types';
+import type { SessionData } from '../types';
 
 /**
  * 会话存储键名常量

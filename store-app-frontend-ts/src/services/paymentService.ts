@@ -4,12 +4,7 @@
  */
 
 import http from '../http-common';
-import {
-  Payment,
-  PaymentResponse,
-  CreatePaymentRequest,
-  IPaymentService,
-} from '../types';
+import type { CreatePaymentRequest, IPaymentService, Payment, PaymentResponse } from '../types';
 
 /**
  * 创建支付
@@ -21,12 +16,9 @@ import {
 export const createPayment = async (
   userId: number,
   orderId: number,
-  data: CreatePaymentRequest
+  data: CreatePaymentRequest,
 ): Promise<PaymentResponse> => {
-  return http.post<Payment>(
-    `/store/users/${userId}/orders/${orderId}/payments`,
-    data
-  );
+  return http.post<Payment>(`/store/users/${userId}/orders/${orderId}/payments`, data);
 };
 
 /**
@@ -39,11 +31,9 @@ export const createPayment = async (
 export const getPayment = async (
   userId: number,
   orderId: number,
-  paymentId: number
+  paymentId: number,
 ): Promise<PaymentResponse> => {
-  return http.get<Payment>(
-    `/store/users/${userId}/orders/${orderId}/payments/${paymentId}`
-  );
+  return http.get<Payment>(`/store/users/${userId}/orders/${orderId}/payments/${paymentId}`);
 };
 
 /**
@@ -56,11 +46,9 @@ export const getPayment = async (
 export const cancelPayment = async (
   userId: number,
   paymentId: number,
-  orderId: number
+  orderId: number,
 ): Promise<PaymentResponse> => {
-  return http.put<Payment>(
-    `/store/users/${userId}/orders/${orderId}/payments/${paymentId}`
-  );
+  return http.put<Payment>(`/store/users/${userId}/orders/${orderId}/payments/${paymentId}`);
 };
 
 /**

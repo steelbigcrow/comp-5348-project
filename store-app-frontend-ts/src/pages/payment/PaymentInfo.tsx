@@ -3,17 +3,18 @@
  * 处理订单支付功能
  */
 
-import React, { useState } from 'react';
+import type { AxiosError } from 'axios';
+import type React from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { paymentService, getSession } from '../../services';
 import { ErrorMessage } from '../../components';
-import {
-  PaymentInfoLocationState,
-  PaymentInfoPageProps,
+import { getSession, paymentService } from '../../services';
+import type {
   FormSubmitHandler,
   InputChangeHandler,
+  PaymentInfoLocationState,
+  PaymentInfoPageProps,
 } from '../../types';
-import { AxiosError } from 'axios';
 
 /**
  * API 错误响应类型
@@ -31,8 +32,7 @@ interface ApiError {
 const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
   // 获取路由状态
   const location = useLocation();
-  const { productId, data, name, price, quantity, total } =
-    (location.state as PaymentInfoLocationState) || {};
+  const { data, name, price, quantity, total } = (location.state as PaymentInfoLocationState) || {};
 
   // 表单状态
   const [cardNumber, setCardNumber] = useState<string>('');
@@ -126,10 +126,7 @@ const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
       <form onSubmit={handlePayment} className="mt-6">
         <div className="mb-4">
           <p className="text-sm text-gray-500mb-2">Order Quantity: {data.quantity}</p>
-          <label
-            className="block text-sm font-medium mb-1"
-            htmlFor="cardNumber"
-          >
+          <label className="block text-sm font-medium mb-1" htmlFor="cardNumber">
             Your Account ID
           </label>
           <input
@@ -138,15 +135,13 @@ const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
             value={cardNumber}
             onChange={handleCardNumberChange}
             required
-            className="w-full border border-gray-300 rounded-md p-2"placeholder="Your Account ID"
+            className="w-full border border-gray-300 rounded-md p-2"
+            placeholder="Your Account ID"
           />
         </div>
 
         <div className="mb-4">
-          <label
-            className="block text-sm font-medium mb-1"
-            htmlFor="cardName"
-          >
+          <label className="block text-sm font-medium mb-1" htmlFor="cardName">
             Address
           </label>
           <input

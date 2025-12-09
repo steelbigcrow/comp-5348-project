@@ -3,5 +3,4 @@
  */
 
 // 导出 withRouter 高阶组件
-export { withRouter } from './withRouter';
-export { default as withRouterDefault } from './withRouter';
+export { default as withRouterDefault, withRouter } from './withRouter';

@@ -3,8 +3,9 @@
  * 显示错误提示信息，5秒后自动关闭
  */
 
-import React, { useEffect } from 'react';
-import { ErrorMessageProps } from '../../types';
+import type React from 'react';
+import { useEffect } from 'react';
+import type { ErrorMessageProps } from '../../types';
 
 /**
  * 自动关闭延迟时间（毫秒）

@@ -3,10 +3,11 @@
  * 显示网站导航链接和用户登录状态
  */
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { NavbarProps } from '../../types';
-import { getSession, clearSession } from '../../services/sessionUtil';
+import { clearSession, getSession } from '../../services/sessionUtil';
+import type { NavbarProps } from '../../types';
 
 /**
  * Navbar 导航栏组件
@@ -39,22 +40,18 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
       <div className="max-w-6xl mx-auto px-4 py-3flex justify-between items-center">
         <div className="text-white text-2xl font-bold">
           <Link to="/">Brand</Link>
-        </div><div className="hidden md:flex space-x-4">
-          {sessionData && sessionData.userId ? (
+        </div>
+        <div className="hidden md:flex space-x-4">
+          {sessionData?.userId ? (
             <>
-              <Link
-                to="/order-list"
-                className="text-white hover:bg-blue-500 px-3 py-2 rounded"
-              >
+              <Link to="/order-list" className="text-white hover:bg-blue-500 px-3 py-2 rounded">
                 Order List
               </Link>
-              <Link
-                to="/profile"
-                className="text-white hover:bg-blue-500 px-3 py-2 rounded"
-              >
+              <Link to="/profile" className="text-white hover:bg-blue-500 px-3 py-2 rounded">
                 Profile
               </Link>
               <button
+                type="button"
                 onClick={handleLogout}
                 className="text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded ml-4"
               >
@@ -63,24 +60,20 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
             </>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="text-white hover:bg-blue-500 px-3 py-2 rounded"
-              >
+              <Link to="/login" className="text-white hover:bg-blue-500 px-3 py-2 rounded">
                 Login
               </Link>
-              <Link
-                to="/register"
-                className="text-white hover:bg-blue-500 px-3 py-2 rounded"
-              >
+              <Link to="/register" className="text-white hover:bg-blue-500 px-3 py-2 rounded">
                 Register
               </Link>
             </>
           )}
         </div>
         <button
+          type="button"
           onClick={toggleMenu}
           className="md:hidden text-white focus:outline-none"
+          aria-label="Toggle menu"
         >
           <svg
             className="w-6 h-6"
@@ -88,6 +81,7 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
           >
             {isOpen ? (
               <path
@@ -108,18 +102,18 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
         </button>
       </div>
       <div className={`md:hidden ${isOpen ? 'block' : 'hidden'} bg-blue-500`}>
-        <a href="#" className="block text-white hover:bg-blue-500 px-4 py-2">
+        <Link to="/" className="block text-white hover:bg-blue-500 px-4 py-2">
           Home
-        </a>
-        <a href="#" className="block text-white hover:bg-blue-500 px-4 py-2">
+        </Link>
+        <Link to="/about" className="block text-white hover:bg-blue-500 px-4 py-2">
           About
-        </a>
-        <a href="#" className="block text-white hover:bg-blue-500 px-4 py-2">
+        </Link>
+        <Link to="/services" className="block text-white hover:bg-blue-500 px-4 py-2">
           Services
-        </a>
-        <a href="#" className="block text-white hover:bg-blue-500 px-4 py-2">
+        </Link>
+        <Link to="/contact" className="block text-white hover:bg-blue-500 px-4 py-2">
           Contact
-        </a>
+        </Link>
       </div>
     </nav>
   );

@@ -4,13 +4,13 @@
  */
 
 import http from '../http-common';
-import {
+import type {
+  CreateProductRequest,
+  IProductService,
   Product,
   ProductListResponse,
   ProductResponse,
-  CreateProductRequest,
   UpdateProductRequest,
-  IProductService,
 } from '../types';
 
 /**
@@ -43,9 +43,7 @@ export const getProduct = async (id: number): Promise<ProductResponse> => {
  * @param data - 创建产品的请求数据
  * @returns Promise 包含新创建产品信息的响应
  */
-export const createProduct = async (
-  data: CreateProductRequest
-): Promise<ProductResponse> => {
+export const createProduct = async (data: CreateProductRequest): Promise<ProductResponse> => {
   return http.post<Product>('/store/products', data);
 };
 
@@ -57,7 +55,7 @@ export const createProduct = async (
  */
 export const updateProduct = async (
   id: number,
-  data: UpdateProductRequest
+  data: UpdateProductRequest,
 ): Promise<ProductResponse> => {
   return http.put<Product>(`/store/products/${id}`, data);
 };

@@ -3,8 +3,8 @@
  * 定义 React 组件的属性类型
  */
 
-import { ReactNode, ComponentType } from 'react';
-import { Location, NavigateFunction, Params } from 'react-router-dom';
+import type { ComponentType, ReactNode } from 'react';
+import type { Location, NavigateFunction, Params } from 'react-router-dom';
 
 // ============================================
 // 通用组件 Props
@@ -85,8 +85,8 @@ export interface WithRouterProps {
  * 高阶组件类型定义
  * @template P - 原组件的 Props 类型
  */
-export type WithRouterHOC =<P extends WithRouterProps>(
-  Component: ComponentType<P>
+export type WithRouterHOC = <P extends WithRouterProps>(
+  Component: ComponentType<P>,
 ) => ComponentType<Omit<P, keyof WithRouterProps>>;
 
 // ============================================

@@ -3,9 +3,9 @@
  * 显示产品列表页面
  */
 
-import React from 'react';
+import type React from 'react';
+import type { HomePageProps } from '../types';
 import ProductDetail from './product/ProductDetail';
-import { HomePageProps } from '../types';
 
 /**
  * HomePage 首页组件

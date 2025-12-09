@@ -3,17 +3,18 @@
  * 处理用户登录功能
  */
 
-import React, { useState } from 'react';
+import type { AxiosError } from 'axios';
+import type React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ErrorMessage } from '../../../components';
-import { userService, setSession } from '../../../services';
-import {
+import { setSession, userService } from '../../../services';
+import type {
+  FormSubmitHandler,
+  InputChangeHandler,
   LoginFormData,
   LoginPageProps,
-  InputChangeHandler,
-  FormSubmitHandler,
 } from '../../../types';
-import {AxiosError } from 'axios';
 
 /**
  * API 错误响应类型
@@ -39,7 +40,7 @@ const Login: React.FC<LoginPageProps> = ({ className }) => {
   const [error, setError] = useState<string>('');
 
   // 路由导航
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   /**
    * 处理输入框变更
@@ -58,8 +59,9 @@ const Login: React.FC<LoginPageProps> = ({ className }) => {
    */
   const handleSubmit: FormSubmitHandler = (e) => {
     e.preventDefault();
-    
-    userService.login(formData)
+
+    userService
+      .login(formData)
       .then((response) => {
         // 检查响应状态是否为 200（成功）
         if (response.status === 200) {
@@ -83,8 +85,17 @@ const Login: React.FC<LoginPageProps> = ({ className }) => {
           setError('Something went wrong. Please try again.');
         }
       });
-    
+
     console.log('Logging in user:', formData);
+  };
+
+  /**
+   * 处理忘记密码点击
+   */
+  const handleForgotPassword = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    // TODO: 实现忘记密码功能
+    alert('Forgot password feature coming soon!');
   };
 
   return (
@@ -129,9 +140,13 @@ const Login: React.FC<LoginPageProps> = ({ className }) => {
           </button>
         </form>
         <div className="text-center mt-4">
-          <a href="#" className="text-blue-500 hover:underline">
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="text-blue-500 hover:underline bg-transparent border-none cursor-pointer"
+          >
             Forgot Password?
-          </a>
+          </button>
         </div>
       </div>
     </div>

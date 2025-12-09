@@ -3,15 +3,14 @@
  * 处理用户相关的 API 请求
  */
 
-import { AxiosResponse } from 'axios';
 import http from '../http-common';
-import {
-  User,
+import type {
+  IUserService,
   LoginRequest,
   RegisterRequest,
   UpdateUserRequest,
+  User,
   UserResponse,
-  IUserService,
 } from '../types';
 
 /**
@@ -47,10 +46,7 @@ export const getUser = async (id: number): Promise<UserResponse> => {
  * @param data - 更新的用户数据
  * @returns Promise 包含更新后用户信息的响应
  */
-export const updateUser = async (
-  id: number,
-  data: UpdateUserRequest
-): Promise<UserResponse> => {
+export const updateUser = async (id: number, data: UpdateUserRequest): Promise<UserResponse> => {
   return http.put<User>(`/store/users/${id}/info/update`, data);
 };
 

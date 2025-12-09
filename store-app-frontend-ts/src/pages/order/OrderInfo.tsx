@@ -3,14 +3,10 @@
  * 显示订单详情并允许用户创建订单
  */
 
-import React from 'react';
+import type React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { orderService, getSession } from '../../services';
-import {
-  OrderInfoLocationState,
-  OrderInfoPageProps,
-  ButtonClickHandler,
-} from '../../types';
+import { getSession, orderService } from '../../services';
+import type { ButtonClickHandler, OrderInfoLocationState, OrderInfoPageProps } from '../../types';
 
 /**
  * OrderInfo 订单信息页面组件
@@ -24,7 +20,7 @@ const OrderInfo: React.FC<OrderInfoPageProps> = ({ className }) => {
   const navigate = useNavigate();
 
   // 从路由状态中获取产品信息
-  const { productId, name, price, quantity, description } = 
+  const { productId, name, price, quantity, description } =
     (location.state as OrderInfoLocationState) || {};
 
   /**
@@ -33,7 +29,7 @@ const OrderInfo: React.FC<OrderInfoPageProps> = ({ className }) => {
    */
   const handleSubmit: ButtonClickHandler = async (e) => {
     e.preventDefault();
-    
+
     // 获取用户会话
     const sessionData = getSession();
     if (!sessionData) {
@@ -41,9 +37,9 @@ const OrderInfo: React.FC<OrderInfoPageProps> = ({ className }) => {
       navigate('/login');
       return;
     }
-    
+
     const userId = sessionData.userId;
-    
+
     try {
       // 调用服务创建订单
       const response = await orderService.create(userId, {
@@ -86,10 +82,11 @@ const OrderInfo: React.FC<OrderInfoPageProps> = ({ className }) => {
   }
 
   return (
-    <div className={`max-w-lg mx-auto my-10 p-8 bg-white rounded-2xl shadow-2xl ${className || ''}`}>
-      <h2 className="text-3xl font-extrabold text-center mb-8 text-gray-800">
-        Order Information
-      </h2><div className="border border-gray-200 rounded-lg p-6 bg-gray-50 shadow-md">
+    <div
+      className={`max-w-lg mx-auto my-10 p-8 bg-white rounded-2xl shadow-2xl ${className || ''}`}
+    >
+      <h2 className="text-3xl font-extrabold text-center mb-8 text-gray-800">Order Information</h2>
+      <div className="border border-gray-200 rounded-lg p-6 bg-gray-50 shadow-md">
         <h3 className="text-xl font-semibold text-gray-700 mb-2">{name}</h3>
         <p className="text-gray-600 mb-4">{description}</p>
         <div className="text-lg">
@@ -107,6 +104,7 @@ const OrderInfo: React.FC<OrderInfoPageProps> = ({ className }) => {
 
       <div className="mt-8 flex justify-center">
         <button
+          type="button"
           onClick={handleSubmit}
           className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition-transform transform hover:scale-105"
         >

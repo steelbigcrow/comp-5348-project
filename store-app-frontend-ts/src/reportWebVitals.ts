@@ -1,4 +1,4 @@
-import { ReportHandler } from 'web-vitals';
+import type { ReportHandler } from 'web-vitals';
 
 /**
  * 性能监控函数

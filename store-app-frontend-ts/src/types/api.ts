@@ -3,8 +3,8 @@
  * 定义与后端 API 交互的请求和响应类型
  */
 
-import { AxiosResponse } from 'axios';
-import { User, Product, Order, Payment } from './models';
+import type { AxiosResponse } from 'axios';
+import type { Order, Payment, Product, User } from './models';
 
 // ============================================
 // 通用 API 响应类型
@@ -236,7 +236,11 @@ export interface IOrderService {
  */
 export interface IPaymentService {
   /** 创建支付 */
-  createPayment(userId: number, orderId: number, data: CreatePaymentRequest): Promise<PaymentResponse>;
+  createPayment(
+    userId: number,
+    orderId: number,
+    data: CreatePaymentRequest,
+  ): Promise<PaymentResponse>;
   /** 取消支付 */
   cancelPayment(userId: number, paymentId: number, orderId: number): Promise<PaymentResponse>;
 }

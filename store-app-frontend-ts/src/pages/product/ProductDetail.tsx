@@ -3,14 +3,11 @@
  * 显示所有产品并提供购买功能
  */
 
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { productService, getSession } from '../../services';
-import {
-  Product,
-  ProductWithQuantity,
-  ProductListPageProps,
-} from '../../types';
+import { getSession, productService } from '../../services';
+import type { Product, ProductListPageProps, ProductWithQuantity } from '../../types';
 
 /**
  * ProductDetail 产品列表页面组件
@@ -39,10 +36,8 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
   const incrementQuantity = (id: number): void => {
     setProducts(
       products.map((product) =>
-        product.id === id
-          ? { ...product, quantity: product.quantity + 1 }
-          : product
-      )
+        product.id === id ? { ...product, quantity: product.quantity + 1 } : product,
+      ),
     );
   };
 
@@ -53,10 +48,8 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
   const decrementQuantity = (id: number): void => {
     setProducts(
       products.map((product) =>
-        product.id === id
-          ? { ...product, quantity: Math.max(1, product.quantity - 1) }
-          : product
-      )
+        product.id === id ? { ...product, quantity: Math.max(1, product.quantity - 1) } : product,
+      ),
     );
   };
 
@@ -87,14 +80,12 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
           (product: Product) => ({
             ...product,
             quantity: 1,
-          })
+          }),
         );
         setProducts(productsWithQuantity);
       } catch (err) {
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : 'Failed to fetch products. Please try again later.';
+          err instanceof Error ? err.message : 'Failed to fetch products. Please try again later.';
         setError(errorMessage);
         console.error('Error fetching products:', err);
       } finally {
@@ -114,22 +105,21 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
   }
 
   return (
-    <div className={`max-w-5xl mx-auto my-10 p-8 bg-gray-50 rounded-xl shadow-lg ${className || ''}`}>
+    <div
+      className={`max-w-5xl mx-auto my-10 p-8 bg-gray-50 rounded-xl shadow-lg ${className || ''}`}
+    >
       <h2 className="text-3xl font-semibold text-center mb-10 text-gray-900">
         Explore Our Products
-      </h2><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {products.map((product) => (
           <div
             key={product.id}
             className="flex flex-col bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
           >
             <div className="p-6 flex-1 flex flex-col">
-              <h3 className="text-xl font-semibold text-gray-800">
-                {product.name}
-              </h3>
-              <p className="text-sm text-gray-600 mt-2 line-clamp-3">
-                {product.description}
-              </p>
+              <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
+              <p className="text-sm text-gray-600 mt-2 line-clamp-3">{product.description}</p>
               <p className="text-2xl font-semibold text-indigo-600 mt-4">
                 ${product.price.toFixed(2)}
               </p>
@@ -138,12 +128,15 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
                 <span>Quantity: {product.quantity}</span>
                 <span className="flex space-x-2">
                   <button
+                    type="button"
                     onClick={() => decrementQuantity(product.id)}
-                    className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 font-semibold rounded-full transition"aria-label="Decrease quantity"
+                    className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 font-semibold rounded-full transition"
+                    aria-label="Decrease quantity"
                   >
                     -
                   </button>
                   <button
+                    type="button"
                     onClick={() => incrementQuantity(product.id)}
                     className="w-8 h-8 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-600 font-semibold rounded-full transition"
                     aria-label="Increase quantity"
@@ -153,17 +146,16 @@ const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
                 </span>
               </p>
 
-              {sessionData && sessionData.userId ? (
+              {sessionData?.userId ? (
                 <button
+                  type="button"
                   onClick={() => handleBuyNow(product)}
                   className="mt-6 bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 transition"
                 >
                   Buy Now
                 </button>
               ) : (
-                <p className="text-red-500 text-sm mt-4">
-                  Please login to purchase
-                </p>
+                <p className="text-red-500 text-sm mt-4">Please login to purchase</p>
               )}
             </div>
           </div>
