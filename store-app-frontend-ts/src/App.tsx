@@ -12,6 +12,7 @@ import {
   OrderList,
   PaymentInfo,
   ProductDetail,
+  ProductList,
   Profile,
   Register,
 } from './pages';
@@ -26,24 +27,23 @@ const App: React.FC = () => {
       <Navbar />
       <div className="mt-3">
         <Routes>
-          {/* 首页 - 产品列表 */}
+          {/* 主页 - 产品列表 */}
           <Route path="/" element={<HomePage />} />
 
-          {/* 认证路由 */}
+          {/* 认证 */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 用户路由 */}
+          {/* 用户信息 */}
           <Route path="/profile" element={<Profile />} />
 
-          {/* 订单路由 */}
-          <Route path="/orders" element={<OrderList />} />
-          <Route path="/order/:id" element={<OrderInfo />} />
+          {/* 订单流 */}
+          <Route path="/order-info" element={<OrderInfo />} />
+          <Route path="/payment-info" element={<PaymentInfo />} />
+          <Route path="/order-list" element={<OrderList />} />
 
-          {/* 支付路由 */}
-          <Route path="/payment/:orderId" element={<PaymentInfo />} />
-
-          {/* 产品路由 */}
+          {/* 产品列表/详情 */}
+          <Route path="/product" element={<ProductList />} />
           <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
       </div>

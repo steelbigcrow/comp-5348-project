@@ -5,7 +5,7 @@
 
 import type React from 'react';
 import type { HomePageProps } from '../types';
-import ProductDetail from './product/ProductDetail';
+import ProductList from './product/ProductList';
 
 /**
  * HomePage 首页组件
@@ -16,7 +16,7 @@ import ProductDetail from './product/ProductDetail';
 const HomePage: React.FC<HomePageProps> = ({ className }) => {
   return (
     <div className={className}>
-      <ProductDetail />
+      <ProductList />
     </div>
   );
 };

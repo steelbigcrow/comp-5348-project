@@ -28,6 +28,7 @@ export { default as PaymentInfo } from './payment/PaymentInfo';
 // 产品页面
 // ============================================
 export { default as ProductDetail } from './product/ProductDetail';
+export { default as ProductList } from './product/ProductList';
 
 // ============================================
 // 用户页面

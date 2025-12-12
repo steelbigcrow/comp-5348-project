@@ -7,7 +7,6 @@
 // 订单服务方法导出
 // ============================================
 export {
-  cancelOrder,
   createOrder,
   default as orderService,
   getOrder,

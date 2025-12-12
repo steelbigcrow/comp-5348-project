@@ -71,8 +71,6 @@ export interface UpdateUserRequest {
   firstName: string;
   /** 姓 */
   lastName: string;
-  /** 邮箱 */
-  email: string;
   /** 密码 */
   password: string;
 }
@@ -211,31 +209,39 @@ export interface IUserService {
 export interface IProductService {
   /** 获取产品列表 */
   getProductList(): Promise<ProductListResponse>;
+  /** 获取所有产品（别名，便于兼容） */
+  getAllProducts(): Promise<ProductListResponse>;
+  /** 获取单个产品 */
+  getProduct(userId: number, id: number): Promise<ProductResponse>;
   /** 创建产品 */
-  create(data: CreateProductRequest): Promise<ProductResponse>;
+  create(userId: number, data: CreateProductRequest): Promise<ProductResponse>;
   /** 更新产品 */
-  update(id: number, data: UpdateProductRequest): Promise<ProductResponse>;
+  update(userId: number, id: number, data: UpdateProductRequest): Promise<ProductResponse>;
+  /** ???? */
+  delete(userId: number, id: number): Promise<ProductResponse>;
 }
 
 /**
  * 订单服务接口
  */
 export interface IOrderService {
-  /** 获取所有订单 */
-  getOrderList(): Promise<OrderListResponse>;
-  /** 获取用户订单列表 */
+  /** 获取订单列表 */
+  getOrderList(userId: number): Promise<OrderListResponse>;
+  /** 获取指定用户的订单列表 */
   getOrderListByUser(userId: number): Promise<OrderListResponse>;
+  /** 获取单个订单 */
+  getOrder(userId: number, orderId: number): Promise<OrderResponse>;
   /** 创建订单 */
   create(userId: number, data: CreateOrderRequest): Promise<OrderResponse>;
   /** 更新订单 */
-  update(id: number, data: UpdateOrderRequest): Promise<OrderResponse>;
+  update(userId: number, orderId: number, data: UpdateOrderRequest): Promise<OrderResponse>;
 }
 
 /**
  * 支付服务接口
  */
 export interface IPaymentService {
-  /** 创建支付 */
+  /** 创建支付记录 */
   createPayment(
     userId: number,
     orderId: number,
@@ -243,4 +249,6 @@ export interface IPaymentService {
   ): Promise<PaymentResponse>;
   /** 取消支付 */
   cancelPayment(userId: number, paymentId: number, orderId: number): Promise<PaymentResponse>;
+  /** 获取支付详情 */
+  getPayment(userId: number, orderId: number, paymentId: number): Promise<PaymentResponse>;
 }

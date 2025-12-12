@@ -67,11 +67,21 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
 
     if (!userId) {
       setError('Please login first.');
+      navigate('/login');
+      return;
+    }
+
+    if (!formData.password) {
+      setError('Password is required to update your profile.');
       return;
     }
 
     userService
-      .update(userId, formData)
+      .update(userId, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password: formData.password,
+      })
       .then((response) => {
         // 检查响应状态是否为 200（成功）
         if (response.status === 200) {
@@ -110,12 +120,12 @@ const Profile: React.FC<UserProfilePageProps> = ({ className }) => {
 
         // 获取用户数据
         const response = await userService.get(userId);
-        // 填充表单数据
+        // 更新表单数据，密码不从接口回填
         setFormData({
           firstName: response.data.firstName || '',
           lastName: response.data.lastName || '',
           email: response.data.email || '',
-          password: response.data.password || '',
+          password: '',
         });
       } catch (err) {
         const axiosError = err as AxiosError<ApiError>;

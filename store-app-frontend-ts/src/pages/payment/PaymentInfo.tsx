@@ -85,8 +85,8 @@ const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
       const response = await paymentService.createPayment(userId, data.id, account);
       if (response && response.status === 200) {
         alert('Payment Successful!');
-        // 可以导航到订单列表页面
-        window.location.href = '/orders';
+        // 支付成功后回到订单列表
+        window.location.href = '/order-list';
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;

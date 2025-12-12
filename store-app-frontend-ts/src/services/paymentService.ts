@@ -58,6 +58,7 @@ export const cancelPayment = async (
 const paymentService: IPaymentService = {
   createPayment,
   cancelPayment,
+  getPayment,
 };
 
 export default paymentService;

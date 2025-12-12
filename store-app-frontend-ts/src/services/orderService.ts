@@ -17,8 +17,8 @@ import type {
  * 获取所有订单列表
  * @returns Promise 包含订单数组的响应
  */
-export const getOrderList = async (): Promise<OrderListResponse> => {
-  return http.get<Order[]>('/store/users/-1/products');
+export const getOrderList = async (userId: number): Promise<OrderListResponse> => {
+  return http.get<Order[]>(`/store/users/${userId}/orders`);
 };
 
 /**
@@ -55,25 +55,17 @@ export const createOrder = async (
 
 /**
  * 更新订单信息
+ * @param userId - 用户ID
  * @param orderId - 订单ID
  * @param data - 更新的订单数据
  * @returns Promise 包含更新后订单信息的响应
  */
 export const updateOrder = async (
+  userId: number,
   orderId: number,
   data: UpdateOrderRequest,
 ): Promise<OrderResponse> => {
-  return http.put<Order>(`/store/orders/${orderId}`, data);
-};
-
-/**
- * 取消订单
- * @param userId - 用户ID
- * @param orderId - 订单ID
- * @returns Promise 包含取消后订单信息的响应
- */
-export const cancelOrder = async (userId: number, orderId: number): Promise<OrderResponse> => {
-  return http.put<Order>(`/store/users/${userId}/orders/${orderId}/cancel`);
+  return http.put<Order>(`/store/users/${userId}/orders/${orderId}`, data);
 };
 
 /**
@@ -83,6 +75,7 @@ export const cancelOrder = async (userId: number, orderId: number): Promise<Orde
 const orderService: IOrderService = {
   getOrderList,
   getOrderListByUser,
+  getOrder,
   create: createOrder,
   update: updateOrder,
 };

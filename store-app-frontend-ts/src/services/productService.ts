@@ -34,8 +34,8 @@ export const getProductList = async (): Promise<ProductListResponse> => {
  * @param id - 产品ID
  * @returns Promise 包含产品信息的响应
  */
-export const getProduct = async (id: number): Promise<ProductResponse> => {
-  return http.get<Product>(`/store/products/${id}`);
+export const getProduct = async (userId: number, id: number): Promise<ProductResponse> => {
+  return http.get<Product>(`/store/users/${userId}/products/${id}`);
 };
 
 /**
@@ -43,8 +43,11 @@ export const getProduct = async (id: number): Promise<ProductResponse> => {
  * @param data - 创建产品的请求数据
  * @returns Promise 包含新创建产品信息的响应
  */
-export const createProduct = async (data: CreateProductRequest): Promise<ProductResponse> => {
-  return http.post<Product>('/store/products', data);
+export const createProduct = async (
+  userId: number,
+  data: CreateProductRequest,
+): Promise<ProductResponse> => {
+  return http.post<Product>(`/store/users/${userId}/products`, data);
 };
 
 /**
@@ -54,10 +57,18 @@ export const createProduct = async (data: CreateProductRequest): Promise<Product
  * @returns Promise 包含更新后产品信息的响应
  */
 export const updateProduct = async (
+  userId: number,
   id: number,
   data: UpdateProductRequest,
 ): Promise<ProductResponse> => {
-  return http.put<Product>(`/store/products/${id}`, data);
+  return http.put<Product>(`/store/users/${userId}/products/${id}`, data);
+};
+
+/**
+ * 删除产品（目前无 UI 使用，但与后端接口保持一致）
+ */
+export const deleteProduct = async (userId: number, id: number): Promise<ProductResponse> => {
+  return http.delete<Product>(`/store/users/${userId}/products/${id}`);
 };
 
 /**
@@ -66,8 +77,11 @@ export const updateProduct = async (
  */
 const productService: IProductService = {
   getProductList,
+  getAllProducts,
+  getProduct,
   create: createProduct,
   update: updateProduct,
+  delete: deleteProduct,
 };
 
 export default productService;

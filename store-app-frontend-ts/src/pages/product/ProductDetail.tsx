@@ -1,165 +1,161 @@
 /**
- * 产品列表页面组件
- * 显示所有产品并提供购买功能
+ * 产品详情页面组件
+ * 点击列表进入后展示单个产品，并支持选择数量下单
  */
 
 import type React from 'react';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getSession, productService } from '../../services';
-import type { Product, ProductListPageProps, ProductWithQuantity } from '../../types';
+import type { Product, WithClassNameProps } from '../../types';
 
 /**
- * ProductDetail 产品列表页面组件
- * 显示所有可购买的产品，支持数量选择和购买
+ * ProductDetail 产品详情页面
  * @param props - 组件属性
- * @returns 产品列表页面 JSX 元素
+ * @returns 产品详情 JSX
  */
-const ProductDetail: React.FC<ProductListPageProps> = ({ className }) => {
-  // 产品列表状态（带数量）
-  const [products, setProducts] = useState<ProductWithQuantity[]>([]);
-  // 加载状态
+const ProductDetail: React.FC<WithClassNameProps> = ({ className }) => {
+  const { id } = useParams<{ id: string }>();
+  const productId = useMemo(() => (id ? parseInt(id, 10) : NaN), [id]);
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
-  // 错误状态
   const [error, setError] = useState<string | null>(null);
 
-  // 获取用户会话
+  const navigate = useNavigate();
   const sessionData = getSession();
 
-  // 路由导航
-  const navigate = useNavigate();
-
-  /**
-   * 增加产品数量
-   * @param id - 产品ID
-   */
-  const incrementQuantity = (id: number): void => {
-    setProducts(
-      products.map((product) =>
-        product.id === id ? { ...product, quantity: product.quantity + 1 } : product,
-      ),
-    );
-  };
-
-  /**
-   * 减少产品数量（最小为1）
-   * @param id - 产品ID
-   */
-  const decrementQuantity = (id: number): void => {
-    setProducts(
-      products.map((product) =>
-        product.id === id ? { ...product, quantity: Math.max(1, product.quantity - 1) } : product,
-      ),
-    );
-  };
-
-  /**
-   * 处理立即购买
-   * @param product - 要购买的产品
-   */
-  const handleBuyNow = (product: ProductWithQuantity): void => {
-    // 导航到订单信息页面，传递产品和数量
-    navigate('/order-info', {
-      state: {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: product.quantity,
-        description: product.description,
-      },
-    });
-  };
+  // 未登录可浏览，用 -1 作为公共访问 userId（后端已支持该约定）
+  const browseUserId = sessionData?.userId ?? -1;
 
   useEffect(() => {
-    const fetchProductData = async () => {
+    const fetchProduct = async () => {
+      if (!Number.isFinite(productId) || productId < 1) {
+        setError('Invalid product id.');
+        setLoading(false);
+        return;
+      }
+
       try {
-        // 获取产品列表
-        const response = await productService.getProductList();
-        // 为每个产品添加默认数量1
-        const productsWithQuantity: ProductWithQuantity[] = response.data.map(
-          (product: Product) => ({
-            ...product,
-            quantity: 1,
-          }),
-        );
-        setProducts(productsWithQuantity);
+        const response = await productService.getProduct(browseUserId, productId);
+        setProduct(response.data);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to fetch products. Please try again later.';
+          err instanceof Error ? err.message : 'Failed to fetch product. Please try again later.';
         setError(errorMessage);
-        console.error('Error fetching products:', err);
+        console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProductData();
-  }, []);
+    fetchProduct();
+  }, [browseUserId, productId]);
+
+  const incrementQuantity = (): void => {
+    setQuantity((q) => q + 1);
+  };
+
+  const decrementQuantity = (): void => {
+    setQuantity((q) => Math.max(1, q - 1));
+  };
+
+  const handleBuyNow = (): void => {
+    if (!product) return;
+
+    if (!sessionData?.userId) {
+      alert('Please login to purchase');
+      navigate('/login');
+      return;
+    }
+
+    navigate('/order-info', {
+      state: {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        description: product.description,
+      },
+    });
+  };
 
   if (loading) {
     return <div className="text-center py-10">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="text-center py-10 text-red-500">Error: {error}</div>;
+  if (error || !product) {
+    return (
+      <div className="max-w-lg mx-auto my-10 p-8 bg-white rounded-2xl shadow-2xl">
+        <h2 className="text-3xl font-extrabold text-center mb-8 text-gray-800">Product Detail</h2>
+        <p className="text-center text-red-500">{error || 'Product not found.'}</p>
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+          >
+            Back
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div
-      className={`max-w-5xl mx-auto my-10 p-8 bg-gray-50 rounded-xl shadow-lg ${className || ''}`}
+      className={`max-w-3xl mx-auto my-10 p-8 bg-white rounded-2xl shadow-2xl ${className || ''}`}
     >
-      <h2 className="text-3xl font-semibold text-center mb-10 text-gray-900">
-        Explore Our Products
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="flex flex-col bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow duration-300"
+      <div className="flex justify-between items-start">
+        <h2 className="text-3xl font-extrabold text-gray-800">{product.name}</h2>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 transition"
+        >
+          Back to list
+        </button>
+      </div>
+
+      <p className="text-gray-600 mt-4">{product.description}</p>
+      <p className="text-3xl font-semibold text-indigo-600 mt-6">${product.price.toFixed(2)}</p>
+
+      <div className="mt-6 flex items-center space-x-4">
+        <span className="text-gray-700 font-medium">Quantity:</span>
+        <div className="flex items-center space-x-2">
+          <button
+            type="button"
+            onClick={decrementQuantity}
+            className="w-9 h-9 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 font-semibold rounded-full transition"
+            aria-label="Decrease quantity"
           >
-            <div className="p-6 flex-1 flex flex-col">
-              <h3 className="text-xl font-semibold text-gray-800">{product.name}</h3>
-              <p className="text-sm text-gray-600 mt-2 line-clamp-3">{product.description}</p>
-              <p className="text-2xl font-semibold text-indigo-600 mt-4">
-                ${product.price.toFixed(2)}
-              </p>
+            -
+          </button>
+          <span className="min-w-8 text-center font-semibold">{quantity}</span>
+          <button
+            type="button"
+            onClick={incrementQuantity}
+            className="w-9 h-9 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-600 font-semibold rounded-full transition"
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
+        </div>
+      </div>
 
-              <p className="text-gray-500 mt-1 flex items-center space-x-4">
-                <span>Quantity: {product.quantity}</span>
-                <span className="flex space-x-2">
-                  <button
-                    type="button"
-                    onClick={() => decrementQuantity(product.id)}
-                    className="w-8 h-8 flex items-center justify-center bg-red-100 hover:bg-red-200 text-red-600 font-semibold rounded-full transition"
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => incrementQuantity(product.id)}
-                    className="w-8 h-8 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-600 font-semibold rounded-full transition"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </span>
-              </p>
-
-              {sessionData?.userId ? (
-                <button
-                  type="button"
-                  onClick={() => handleBuyNow(product)}
-                  className="mt-6 bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 transition"
-                >
-                  Buy Now
-                </button>
-              ) : (
-                <p className="text-red-500 text-sm mt-4">Please login to purchase</p>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="mt-8">
+        {sessionData?.userId ? (
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            className="w-full bg-indigo-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Buy Now
+          </button>
+        ) : (
+          <p className="text-red-500 text-sm mt-2">Please login to purchase</p>
+        )}
       </div>
     </div>
   );

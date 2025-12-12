@@ -57,7 +57,7 @@ export interface UserProfileFormData {
   /** 姓 */
   lastName: string;
   /** 邮箱 */
-  email: string /** 密码 */;
+  email?: string /** 邮箱 */;
   password: string;
 }
 
