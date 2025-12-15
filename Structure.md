@@ -109,21 +109,46 @@ graph TB
 
 系统使用PostgreSQL数据库，主要表关系如下：
 
+> 注意：本项目是 4 个独立的 Spring Boot 服务，每个服务使用**独立的 PostgreSQL 数据库**（见各服务 `application.properties` 里的 `spring.datasource.url`）。  
+> 因此同一服务内可以有外键约束；跨服务的数据关联仅通过 **ID 字段**实现（无跨库外键）。
+
+### Store Application（DB: `comp5348_assignment_2`）
+
 ```mermaid
 erDiagram
     users ||--o{ orders : places
-    products ||--o{ orders : contains
-    products ||--o{ inventory : stored_in
-    warehouses ||--o{ inventory : contains
-    orders ||--o{ payments : requires
-    orders ||--o{ refunds : may_have
-    orders ||--o{ inventory_transactions : triggers
-    inventory ||--o{ inventory_transactions : records
-    customers ||--o{ accounts : owns
-    accounts ||--o{ transaction_records : generates
-    orders ||--o{ deliveries : spawns
-    deliveries ||--o{ emails : triggers
+    product ||--o{ orders : contains
+    product ||--o{ inventory : stocked_in
+    warehouse ||--o{ inventory : stores
+    orders ||--o{ inventory_transaction : triggers
+    inventory ||--o{ inventory_transaction : records
+    orders ||--o| payment : pays
+    orders ||--o| refund : may_have
 ```
+
+### Bank Application（DB: `bank_application`）
+
+```mermaid
+erDiagram
+    customer ||--o{ account : owns
+    account o|--o{ transaction_record : from_account
+    account o|--o{ transaction_record : to_account
+```
+
+### Delivery Application（DB: `delivery_application`）
+
+- 表：`delivery`
+- 关键字段：`delivery.order_id`（逻辑关联到 Store 的 `orders.id`，无跨库外键）
+
+### Email Application（DB: `email_application`）
+
+- 表：`email`
+- 关键字段：`email.delivery_id`（逻辑关联到 Delivery 的 `delivery.id`，无跨库外键）
+
+跨服务逻辑关联（仅 ID，不是外键）：
+- `payment.transaction_record_id` -> `bank_application.transaction_record.id`
+- `payment.from_account_id` -> `bank_application.account.id`
+- `refund.transaction_record_id` -> `bank_application.transaction_record.id`
 
 ## 跨应用通信
 
