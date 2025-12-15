@@ -42,7 +42,7 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
   const [error, setError] = useState<string>('');
 
   // 路由导航
-  const _navigate = useNavigate();
+  const navigate = useNavigate();
 
   /**
    * 处理输入框变更
@@ -72,7 +72,7 @@ const Register: React.FC<RegisterPageProps> = ({ className }) => {
           // 保存用户会话
           setSession({ userId });
           // 重定向到首页
-          window.location.href = '/';
+          navigate('/', { replace: true });
         }
       })
       .catch((err: AxiosError<ApiError>) => {

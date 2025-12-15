@@ -3,7 +3,8 @@
  *配置基础 URL 和默认请求头
  */
 
-import axios, { type AxiosInstance } from 'axios';
+import type { AxiosInstance } from 'axios';
+import axios from 'axios/dist/browser/axios.cjs';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8080';
 

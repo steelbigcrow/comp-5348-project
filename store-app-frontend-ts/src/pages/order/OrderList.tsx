@@ -52,7 +52,21 @@ const OrderList: React.FC<OrderListPageProps> = ({ className }) => {
           if (response.status === 200) {
             alert('Payment cancelled successfully');
             //刷新订单列表
-            window.location.reload();
+            setOrders((previousOrders) =>
+              previousOrders.map((order) => {
+                if (order.id !== orderId) {
+                  return order;
+                }
+
+                return {
+                  ...order,
+                  orderStatus: 'REFUNDED',
+                  payment: order.payment
+                    ? { ...order.payment, paymentStatus: 'REFUNDED' }
+                    : order.payment,
+                };
+              }),
+            );
           }
         })
         .catch((err: AxiosError<ApiError>) => {

@@ -18,7 +18,12 @@ const SESSION_KEYS = {
  */
 export const getUserId = (): number | null => {
   const userId = sessionStorage.getItem(SESSION_KEYS.USER_ID);
-  return userId ? parseInt(userId, 10) : null;
+  if (!userId) {
+    return null;
+  }
+
+  const parsedUserId = parseInt(userId, 10);
+  return Number.isFinite(parsedUserId) ? parsedUserId : null;
 };
 
 /**

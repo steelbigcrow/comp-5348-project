@@ -5,7 +5,7 @@
 
 import type React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { clearSession, getSession } from '../../services/sessionUtil';
 import type { NavbarProps } from '../../types';
 
@@ -18,6 +18,7 @@ import type { NavbarProps } from '../../types';
 const Navbar: React.FC<NavbarProps> = ({ className }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const sessionData = getSession();
+  const navigate = useNavigate();
 
   /**
    * 切换移动端菜单显示状态
@@ -32,7 +33,8 @@ const Navbar: React.FC<NavbarProps> = ({ className }) => {
    */
   const handleLogout = (): void => {
     clearSession();
-    window.location.reload();
+    setIsOpen(false);
+    navigate('/login', { replace: true });
   };
 
   return (

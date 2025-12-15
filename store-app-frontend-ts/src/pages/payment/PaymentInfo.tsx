@@ -6,7 +6,7 @@
 import type { AxiosError } from 'axios';
 import type React from 'react';
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ErrorMessage } from '../../components';
 import { getSession, paymentService } from '../../services';
 import type {
@@ -32,6 +32,7 @@ interface ApiError {
 const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
   // 获取路由状态
   const location = useLocation();
+  const navigate = useNavigate();
   const { data, name, price, quantity, total } = (location.state as PaymentInfoLocationState) || {};
 
   // 表单状态
@@ -86,7 +87,7 @@ const PaymentInfo: React.FC<PaymentInfoPageProps> = ({ className }) => {
       if (response && response.status === 200) {
         alert('Payment Successful!');
         // 支付成功后回到订单列表
-        window.location.href = '/order-list';
+        navigate('/order-list', { replace: true });
       }
     } catch (err) {
       const axiosError = err as AxiosError<ApiError>;
